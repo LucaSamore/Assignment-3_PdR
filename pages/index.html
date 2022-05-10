@@ -16,7 +16,37 @@
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        <h1>Hello!</h1>
+        <h1>Welcome!</h1>
+
+        <h2>Sign In</h2>
+        <p>Log in to your account.</p>
+        <hr>
+        
+        <form action="http://192.168.178.40:8080/signIn" method="post">
+            <label for="email"><b>Email</b></label>
+            <input type="text" placeholder="Enter Email" name="email" required>
+
+            <label for="psw"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="psw" required>
+
+            <button type="submit">Sign In</button>
+        </form>
+
+        <p>If you don't have an account, consider to sign up.</p>
+
+        <h2>Sign Up</h2>
+        <p>Please fill in this form to create an account.</p>
+        <hr>
+        
+        <form action="http://192.168.178.40:8080/signUp" method="post">
+            <label for="email"><b>Email</b></label>
+            <input type="text" placeholder="Enter Email" name="email" required>
+
+            <label for="psw"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="psw" required>
+
+            <button type="submit">Sign Up</button>
+        </form>
         <script src="" async defer></script>
     </body>
 </html>

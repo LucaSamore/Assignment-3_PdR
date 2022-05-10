@@ -5,6 +5,7 @@ from server import ServerHandler
 
 PORT = 8080
 IP_ADDRESS = socket.gethostbyname(socket.gethostname())
+
 server = socketserver.ThreadingTCPServer((IP_ADDRESS, PORT), ServerHandler)
 
 def signal_handler(signal, frame):
