@@ -22,7 +22,7 @@ class DBHandler:
     
     def __save_users(self):
         with open(self.USERS_PATH, 'w') as file:
-            json.dump([user.__dict__ for user in self.users], file)
+            json.dump([user.__dict__ for user in self.users], file, indent=1)
 
     def __read_users(self):
         with open(self.USERS_PATH) as file:
