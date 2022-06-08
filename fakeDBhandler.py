@@ -14,7 +14,6 @@ class DBHandler:
         self.__save_users()
     
     def does_user_exist(self, user):
-        print(user.__dict__)
         return user.email in map(lambda u: u.email, self.users)
     
     def get_users(self):

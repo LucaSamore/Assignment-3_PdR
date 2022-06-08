@@ -1,12 +1,9 @@
 import sys, signal
 import socketserver
-import socket
+from config import CONFIG
 from server import ServerHandler
 
-PORT = 8080
-IP_ADDRESS = socket.gethostbyname(socket.gethostname())
-
-server = socketserver.ThreadingTCPServer((IP_ADDRESS, PORT), ServerHandler)
+server = socketserver.ThreadingTCPServer((CONFIG['address'], CONFIG['port']), ServerHandler)
 
 def signal_handler(signal, frame):
     print("Server is shutting down...")
@@ -17,7 +14,7 @@ def signal_handler(signal, frame):
         sys.exit(0)
 
 def main():
-    print(f'Server is running at http://{IP_ADDRESS}:{PORT}')
+    print(f'Server is running at http://{CONFIG["address"]}:{CONFIG["port"]}')
     server.daemon_threads = True
     server.allow_reuse_address = True
     signal.signal(signal.SIGINT, signal_handler)
