@@ -30,9 +30,6 @@ class ServerHandler(SimpleHTTPRequestHandler):
     _current_user: User = None
     
     def do_GET(self) -> None:
-        auth_header = self.headers.get('Authorization')
-        print("Header authorization:")
-        print(auth_header)
         
         result: Optional[str] = self._router.handle_route(self.path)
         
@@ -56,7 +53,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
     def __login(self) -> None:
         fields: dict = self.__get_login_form_fields()
         self.__validate_user(fields["email"], fields["password"])
-        loggedUser: User = self._db.find_user_by_email(fields["email"])
+        loggedUser: User = self._db.find_user(fields["email"], fields["password"])
         
         if loggedUser:
             self._current_user = loggedUser
@@ -109,7 +106,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
         
         return {
             'email': form.getvalue('email'),
-            'password': form.getvalue('password')
+            'password': form.getvalue('psw')
         }
     
     def __get_register_form_fields(self) -> dict:

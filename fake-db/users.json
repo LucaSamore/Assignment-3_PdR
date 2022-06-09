@@ -3,18 +3,6 @@
   "name": "Mario",
   "surname": "Rossi",
   "email": "ciaone@gmail.com",
-  "password": "$2b$12$.1Q2eiwZNxnUMEL/hWVrWurPI42AaQgGko574VoG74C2l2ZxhVfY."
- },
- {
-  "name": "Luigi",
-  "surname": "Verdi",
-  "email": "ciao@123.com",
-  "password": "$2b$12$QdmJpiGJN.uOjccZMcMuhOxDCTbzBHzhnS5pvOWIcsM8X8dHnqdY2"
- },
- {
-  "name": "Mario",
-  "surname": "Rossi",
-  "email": "qwerty@gmail.com",
-  "password": "$2b$12$k/wWGDV5KJXvPnotHkmx4elJ7kOmFKD39SGmKwBL7/Z.K8xL8GC7C"
+  "password": "$2b$12$fvqq/yE.U8A4nL6mMYTJt.wIy5YEksY5uhfEGLV7w5uYfFH0TBpSC"
  }
 ]

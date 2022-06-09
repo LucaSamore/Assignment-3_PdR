@@ -3,6 +3,7 @@ from config import CONFIG
 from user import User
 from typing import Optional
 import json
+import bcrypt
 
 class DBHandler:
         
@@ -16,8 +17,8 @@ class DBHandler:
             return True
         return False
     
-    def find_user_by_email(self, email: str) -> Optional[User]:
-        return next((u for u in self._users if u.email == email), None)
+    def find_user(self, email: str, password: str) -> Optional[User]:
+        return next((u for u in self._users if u.email == email and bcrypt.checkpw(password.encode('utf8'), u.password)), None)
     
     def __add_user(self, newUser: User) -> None:
         self._users.append(newUser)
