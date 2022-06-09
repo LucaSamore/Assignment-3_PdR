@@ -8,6 +8,7 @@ from typing import Optional
 from http.server import SimpleHTTPRequestHandler
 from fakeDBhandler import DBHandler
 from user import User
+from auth import AuthorizationHandler
 
 class Router:
     
@@ -25,13 +26,20 @@ class ServerHandler(SimpleHTTPRequestHandler):
 
     _router: Router = Router()
     _db: DBHandler = DBHandler()
+    _auth: AuthorizationHandler = AuthorizationHandler()
+    _current_user: User = None
     
     def do_GET(self) -> None:
+        
+        auth_header = self.headers.get('Authorization')
+        print("Header authorization:")
+        print(auth_header)
+        
         result: Optional[str] = self._router.handle_route(self.path)
         
         if result:
-            self.path = result
             self.send_response(200)
+            self.path = result
         else:
             self.send_response(404, "Page not found")
         
@@ -39,30 +47,51 @@ class ServerHandler(SimpleHTTPRequestHandler):
     
     def do_POST(self) -> None:
         if self.path.find("login") != -1:
-            fields: dict = self.__get_login_form_fields()
-            self.__validate_user(fields["email"], fields["password"])
-            loggedUser: User = self._db.find_user_by_email(fields["email"])
-            
-            if loggedUser:
-                self.path = "/pages/home.html"
-                self.do_GET()
-            else:
-                self.send_error(401, "User not found")
+            self.__login()
         
         if self.path.find("register") != -1:
-            fields: dict = self.__get_register_form_fields()
-            self.__validate_user(fields["email"], fields["password"])
+            self.__registration()
+                
+    def end_headers(self):
+        if self._current_user:
+            self.__create_authorization_header(self._current_user)
+        SimpleHTTPRequestHandler.end_headers(self)
+        
+    def __login(self) -> None:
+        fields: dict = self.__get_login_form_fields()
+        self.__validate_user(fields["email"], fields["password"])
+        loggedUser: User = self._db.find_user_by_email(fields["email"])
+        
+        if loggedUser:
+            self._current_user = loggedUser
+            #self.__create_authorization_header(loggedUser)
+            self.path = "/pages/home.html"
+            self.do_GET()
+        else:
+            self.send_error(401, "User not found")
+        
+    def __registration(self) -> None:
+        fields: dict = self.__get_register_form_fields()
+        self.__validate_user(fields["email"], fields["password"])
+        
+        newUser: User = User(fields["name"], 
+                             fields["surname"], 
+                             fields["email"], 
+                             self.__hash_password(fields["password"]))
+        
+        if self._db.try_add(newUser):
+            self._current_user = newUser
+            #self.__create_authorization_header(newUser)
+            self.path = "/pages/home.html"
+            self.do_GET()
+        else:
+            self.send_error(409, "Email already in used")
             
-            newUser: User = User(fields["name"], 
-                                 fields["surname"], 
-                                 fields["email"], 
-                                 self.__hash_password(fields["password"]))
-            
-            if self._db.try_add(newUser):
-                self.path = "/pages/home.html"
-                self.do_GET()
-            else:
-                self.send_error(409, "Email already in used")
+    def __hit_homepage(self) -> None:
+        ...
+        
+    def __create_authorization_header(self, user: User) -> None:
+        self.send_header('Authorization', 'Bearer ' + self._auth.encode_jwt_token(user))
     
     def __validate_user(self, email: str, password: str) -> None:
         if not self.__validate_email(email) and self.__validate_password(password):
