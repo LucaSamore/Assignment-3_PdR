@@ -30,7 +30,6 @@ class ServerHandler(SimpleHTTPRequestHandler):
     _current_user: User = None
     
     def do_GET(self) -> None:
-        
         auth_header = self.headers.get('Authorization')
         print("Header authorization:")
         print(auth_header)
@@ -38,10 +37,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
         result: Optional[str] = self._router.handle_route(self.path)
         
         if result:
-            self.send_response(200)
             self.path = result
-        else:
-            self.send_response(404, "Page not found")
         
         SimpleHTTPRequestHandler.do_GET(self)
     
