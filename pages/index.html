@@ -22,7 +22,7 @@
         <p>Log in to your account.</p>
         <hr>
         
-        <form action="http://localhost:8080/signIn" method="post">
+        <form action="http://localhost:8080/login" method="post">
             <label for="email"><b>Email</b></label>
             <input type="text" placeholder="Enter Email" name="email" required>
 
@@ -38,12 +38,18 @@
         <p>Please fill in this form to create an account.</p>
         <hr>
         
-        <form action="http://localhost:8080/signUp" method="post">
+        <form action="http://localhost:8080/register" method="post">
+            <label for="name"><b>Name</b></label>
+            <input type="text" placeholder="Enter your name" name="name" required>
+        
+            <label for="surname"><b>Surname</b></label>
+            <input type="text" placeholder="Enter your surname" name="surname" required>
+
             <label for="email"><b>Email</b></label>
-            <input type="text" placeholder="Enter Email" name="email" required>
+            <input type="text" placeholder="Enter your email" name="email" required>
 
             <label for="psw"><b>Password</b></label>
-            <input type="password" placeholder="Enter Password" name="psw" required>
+            <input type="password" placeholder="Enter your password" name="psw" required>
 
             <button type="submit">Sign Up</button>
         </form>
