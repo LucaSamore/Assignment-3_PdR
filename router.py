@@ -8,6 +8,7 @@ class Router:
                                '/pages/service3.html']
     
     def handle_route(self, route: str) -> Optional[str]:
+        print(route)
         if route == "/":
             return "/pages/index.html"
         if path.exists(route):

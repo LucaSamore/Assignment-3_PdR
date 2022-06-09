@@ -22,11 +22,14 @@ class ServerHandler(SimpleHTTPRequestHandler):
         result: Optional[str] = self._router.handle_route(self.path)
         if result:            
             self.send_response(302)
+            print(self.path)
             if self._router.is_protected(self.path):
                 if not self.__verify_token():
                     result = "/pages/index.html"
             self.send_header('Location', result)
             self.end_headers()
+        else:
+            print("HEYOOO")
         SimpleHTTPRequestHandler.do_GET(self)
             
     def do_POST(self) -> None:
@@ -35,14 +38,13 @@ class ServerHandler(SimpleHTTPRequestHandler):
         
         if self.path.find("register") != -1:
             self.__registration()
-                
     
     def end_headers(self):
         if self._current_user and not self.headers.get('Set-Cookie'):
             cookie: SimpleCookie = self.__create_cookie()
             for morsel in cookie.values():
                 self.send_header("Set-Cookie", morsel.OutputString())
-            
+                #print(self.headers['Cookie'])
         SimpleHTTPRequestHandler.end_headers(self)
     
         
@@ -84,7 +86,9 @@ class ServerHandler(SimpleHTTPRequestHandler):
         return newCookie
     
     def __verify_token(self) -> bool:
-        ...
+        token: str = self.headers['Cookie'].split("=")[1]
+        print(token)
+        return self._auth.is_valid(self._current_user, token)
     
     def __create_authorization_header(self, user: User) -> None:
         self.send_header('Authorization', 'Bearer ' + self._auth.encode_jwt_token(user))
