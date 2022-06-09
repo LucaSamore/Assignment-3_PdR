@@ -27,41 +27,46 @@ class ServerHandler(SimpleHTTPRequestHandler):
     _db: DBHandler = DBHandler()
     
     def do_GET(self) -> None:
-        
         result: Optional[str] = self._router.handle_route(self.path)
         
         if result:
             self.path = result
             self.send_response(200)
         else:
-            self.send_response(404, "Page not found...")
+            self.send_response(404, "Page not found")
         
         SimpleHTTPRequestHandler.do_GET(self)
     
     def do_POST(self) -> None:
         if self.path.find("login") != -1:
-            ...
+            fields: dict = self.__get_login_form_fields()
+            self.__validate_user(fields["email"], fields["password"])
+            loggedUser: User = self._db.find_user_by_email(fields["email"])
+            
+            if loggedUser:
+                self.path = "/pages/home.html"
+                self.do_GET()
+            else:
+                self.send_error(401, "User not found")
         
         if self.path.find("register") != -1:
             fields: dict = self.__get_register_form_fields()
+            self.__validate_user(fields["email"], fields["password"])
             
-            if self.__validate_user(fields['email'], fields['password']):
-                newUser: User = User(fields['name'], 
-                                     fields['surname'], 
-                                     fields['email'], 
-                                     self.__hash_password(fields['password']))
-                
-                if self._db.try_add(newUser):
-                    self.path = "/pages/home.html"
-                    self.do_GET()
-                else:
-                    self.send_error(409, 'Email already in used')
-                
+            newUser: User = User(fields["name"], 
+                                 fields["surname"], 
+                                 fields["email"], 
+                                 self.__hash_password(fields["password"]))
+            
+            if self._db.try_add(newUser):
+                self.path = "/pages/home.html"
+                self.do_GET()
             else:
-                self.send_error(400, 'Email and/or password are not correct buddy')
+                self.send_error(409, "Email already in used")
     
-    def __validate_user(self, email: str, password: str) -> bool:
-        return self.__validate_email(email) and self.__validate_password(password)
+    def __validate_user(self, email: str, password: str) -> None:
+        if not self.__validate_email(email) and self.__validate_password(password):
+            self.send_error(400, "Email and/or password are not correct buddy")
     
     def __validate_email(self, email: str) -> Optional[Match]:
         regex: Pattern = re.compile(r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+')

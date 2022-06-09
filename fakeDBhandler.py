@@ -1,6 +1,7 @@
 from types import SimpleNamespace as Namespace
 from config import CONFIG
 from user import User
+from typing import Optional
 import json
 
 class DBHandler:
@@ -10,10 +11,13 @@ class DBHandler:
         self.__read_users()
     
     def try_add(self, user: User) -> bool:
-        if self.__does_user_exist(user):
+        if not self.__does_user_exist(user):
             self.__add_user(user)
             return True
         return False
+    
+    def find_user_by_email(self, email: str) -> Optional[User]:
+        return next((u for u in self._users if u.email == email), None)
     
     def __add_user(self, newUser: User) -> None:
         self._users.append(newUser)
@@ -21,9 +25,6 @@ class DBHandler:
     
     def __does_user_exist(self, user: User) -> bool:
         return user.email in map(lambda u: u.email, self._users)
-    
-    def get_users(self) -> list[User]:
-        return self._users
     
     def __save_users(self) -> None:
         with open(CONFIG['user_path'], 'w') as file:
