@@ -1,47 +1,34 @@
 import re
 import cgi
 import bcrypt
+from http.server import SimpleHTTPRequestHandler
+from router import Router
 from cgi import FieldStorage
 from re import Match, Pattern
-from os import path
 from typing import Optional
-from http.server import SimpleHTTPRequestHandler
 from fakeDBhandler import DBHandler
 from user import User
 from auth import AuthorizationHandler
 from http import cookies
 from http.cookies import SimpleCookie
 
-class Router:
-    
-    def handle_route(self, route: str) -> Optional[str]:
-        if route == "/":
-            return "/pages/index.html"
-        return self.find_page(route)
-    
-    def find_page(self, pagePath: str) -> Optional[str]:
-        if path.exists(pagePath):
-            return pagePath
-        return None
-
 class ServerHandler(SimpleHTTPRequestHandler):
-
     _router: Router = Router()
     _db: DBHandler = DBHandler()
     _auth: AuthorizationHandler = AuthorizationHandler()
     _current_user: User = None
     
     def do_GET(self) -> None:
-        
-        print(self.headers)
-        
         result: Optional[str] = self._router.handle_route(self.path)
-        
-        if result:
-            self.path = result
-        
+        if result:            
+            self.send_response(302)
+            if self._router.is_protected(self.path):
+                if not self.__verify_token():
+                    result = "/pages/index.html"
+            self.send_header('Location', result)
+            self.end_headers()
         SimpleHTTPRequestHandler.do_GET(self)
-    
+            
     def do_POST(self) -> None:
         if self.path.find("login") != -1:
             self.__login()
@@ -49,6 +36,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
         if self.path.find("register") != -1:
             self.__registration()
                 
+    
     def end_headers(self):
         if self._current_user and not self.headers.get('Set-Cookie'):
             cookie: SimpleCookie = self.__create_cookie()
@@ -56,6 +44,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
                 self.send_header("Set-Cookie", morsel.OutputString())
             
         SimpleHTTPRequestHandler.end_headers(self)
+    
         
     def __login(self) -> None:
         fields: dict = self.__get_login_form_fields()
@@ -64,9 +53,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
         
         if loggedUser:
             self._current_user = loggedUser
-            #self.__create_authorization_header(loggedUser)
-            self.path = "/pages/home.html"
-            self.do_GET()
+            self.__hit_homepage()
         else:
             self.send_error(401, "User not found")
         
@@ -81,19 +68,23 @@ class ServerHandler(SimpleHTTPRequestHandler):
         
         if self._db.try_add(newUser):
             self._current_user = newUser
-            #self.__create_authorization_header(newUser)
-            self.path = "/pages/home.html"
-            self.do_GET()
+            self.__hit_homepage()
         else:
             self.send_error(409, "Email already in used")
             
     def __hit_homepage(self) -> None:
-        ...
+        self.send_response(301)
+        self.send_header('Content-type', 'text/html')
+        self.send_header('Location', '/pages/home.html')
+        self.end_headers()
         
     def __create_cookie(self) -> SimpleCookie:
         newCookie: SimpleCookie = cookies.SimpleCookie()
         newCookie['token'] = self._auth.encode_jwt_token(self._current_user)
         return newCookie
+    
+    def __verify_token(self) -> bool:
+        ...
     
     def __create_authorization_header(self, user: User) -> None:
         self.send_header('Authorization', 'Bearer ' + self._auth.encode_jwt_token(user))

@@ -10,5 +10,11 @@
   "surname": "Verdi",
   "email": "luigi@gmail.com",
   "password": "$2b$12$AM5tnkR/KR3L9dUruMVmvuApqoQZyuNOcQwOIXHK5ZPHmSA/9Qw0m"
+ },
+ {
+  "name": "AAA",
+  "surname": "BBB",
+  "email": "aaa@gmail.com",
+  "password": "$2b$12$7bKj99kbHBvdb3e7Zs3K4OXpKag.qwez8P.5WMzIy0my38dke/BJy"
  }
 ]
