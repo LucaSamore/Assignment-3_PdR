@@ -4,5 +4,11 @@
   "surname": "Rossi",
   "email": "ciaone@gmail.com",
   "password": "$2b$12$fvqq/yE.U8A4nL6mMYTJt.wIy5YEksY5uhfEGLV7w5uYfFH0TBpSC"
+ },
+ {
+  "name": "Luigi",
+  "surname": "Verdi",
+  "email": "luigi@gmail.com",
+  "password": "$2b$12$AM5tnkR/KR3L9dUruMVmvuApqoQZyuNOcQwOIXHK5ZPHmSA/9Qw0m"
  }
 ]

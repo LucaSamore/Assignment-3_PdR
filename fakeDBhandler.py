@@ -18,7 +18,7 @@ class DBHandler:
         return False
     
     def find_user(self, email: str, password: str) -> Optional[User]:
-        return next((u for u in self._users if u.email == email and bcrypt.checkpw(password.encode('utf8'), u.password)), None)
+        return next((u for u in self._users if u.email == email and bcrypt.checkpw(password.encode('utf-8'), u.password.encode('utf-8'))), None)
     
     def __add_user(self, newUser: User) -> None:
         self._users.append(newUser)
