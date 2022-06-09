@@ -9,6 +9,8 @@ from http.server import SimpleHTTPRequestHandler
 from fakeDBhandler import DBHandler
 from user import User
 from auth import AuthorizationHandler
+from http import cookies
+from http.cookies import SimpleCookie
 
 class Router:
     
@@ -31,6 +33,8 @@ class ServerHandler(SimpleHTTPRequestHandler):
     
     def do_GET(self) -> None:
         
+        print(self.headers)
+        
         result: Optional[str] = self._router.handle_route(self.path)
         
         if result:
@@ -46,8 +50,11 @@ class ServerHandler(SimpleHTTPRequestHandler):
             self.__registration()
                 
     def end_headers(self):
-        if self._current_user:
-            self.__create_authorization_header(self._current_user)
+        if self._current_user and not self.headers.get('Set-Cookie'):
+            cookie: SimpleCookie = self.__create_cookie()
+            for morsel in cookie.values():
+                self.send_header("Set-Cookie", morsel.OutputString())
+            
         SimpleHTTPRequestHandler.end_headers(self)
         
     def __login(self) -> None:
@@ -83,6 +90,11 @@ class ServerHandler(SimpleHTTPRequestHandler):
     def __hit_homepage(self) -> None:
         ...
         
+    def __create_cookie(self) -> SimpleCookie:
+        newCookie: SimpleCookie = cookies.SimpleCookie()
+        newCookie['token'] = self._auth.encode_jwt_token(self._current_user)
+        return newCookie
+    
     def __create_authorization_header(self, user: User) -> None:
         self.send_header('Authorization', 'Bearer ' + self._auth.encode_jwt_token(user))
     
