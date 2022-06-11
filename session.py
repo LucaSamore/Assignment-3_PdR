@@ -15,9 +15,10 @@ class SessionsManager:
         self._sessions: list = []
     
     def create_session(self, ip: str, user: User) -> None:
-        newSession = Session(ip, user)
-        if newSession not in self._sessions:
-            self._sessions.append(newSession)
+        newSession: Session = Session(ip, user)
+        for existing in self.find_sessions_by_user_and_ip(ip, user):
+            self.delete_session(existing)
+        self._sessions.append(newSession)
         
     def delete_session(self, session: Session) -> None:
         if session in self._sessions:
@@ -31,3 +32,6 @@ class SessionsManager:
     
     def find_session_by_ip(self, ip: str) -> Optional[Session]:
         return next((s for s in self._sessions if s.ip == ip), None)
+    
+    def find_sessions_by_user_and_ip(self, ip: str, user: User) -> list:
+        yield filter(lambda s: s.ip == ip and s.user == user, self._sessions)
