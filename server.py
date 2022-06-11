@@ -11,18 +11,38 @@ from user import User
 from auth import AuthorizationHandler
 from http import cookies
 from http.cookies import SimpleCookie
-
+from session import Session
+from session import SessionsManager
 
 _current_user: User = None
-
 
 class ServerHandler(SimpleHTTPRequestHandler):
     _router: Router = Router()
     _db: DBHandler = DBHandler()
+    _sessionsManager = SessionsManager()
     _auth: AuthorizationHandler = AuthorizationHandler()
     #_current_user: User = None
     
     def do_GET(self) -> None:
+        result: Optional[str] = self._router.handle_route(self.path)
+        
+        if result:
+            self.send_response(200)
+            if not self._sessionsManager.has_session(self.client_address[0]):
+                self.path = "/pages/index.html"
+            else:
+                current_session: Session = self._sessionsManager.find_session_by_ip(self.client_address[0])
+                if self._sessionsManager.is_expired(current_session):
+                    self._sessionsManager.delete_session(current_session)
+                    self.path = "/pages/index.html"
+                else:
+                    self.path = result
+        else:
+            self.send_error(404)
+        
+        SimpleHTTPRequestHandler.do_GET(self)
+        
+        """
         result: Optional[str] = self._router.handle_route(self.path)
         
         if result:            
@@ -39,6 +59,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
             print("HEYOOO")
             self.send_error(404)
         SimpleHTTPRequestHandler.do_GET(self)
+        """
             
     def do_POST(self) -> None:
         if self.path.find("login") != -1:
@@ -47,6 +68,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
         if self.path.find("register") != -1:
             self.__registration()
     
+    """
     def end_headers(self):
         global _current_user
         if _current_user and not self.headers.get('Set-Cookie'):
@@ -55,22 +77,28 @@ class ServerHandler(SimpleHTTPRequestHandler):
                 self.send_header("Set-Cookie", morsel.OutputString())
                 #print(self.headers['Cookie'])
         SimpleHTTPRequestHandler.end_headers(self)
-    
+    """
         
     def __login(self) -> None:
-        global _current_user
+        #global _current_user
         fields: dict = self.__get_login_form_fields()
         self.__validate_user(fields["email"], fields["password"])
         loggedUser: User = self._db.find_user(fields["email"], fields["password"])
         
         if loggedUser:
-            _current_user = loggedUser
-            self.__hit_homepage()
+            #_current_user = loggedUser
+            #self.__hit_homepage()
+            self._sessionsManager.create_session(self.client_address[0], loggedUser)
+            self.send_response(301)
+            self.send_header('Content-type', 'text/html')
+            self.send_header('Location', '/pages/home.html')
+            self.end_headers()
+            
         else:
             self.send_error(401, "User not found")
         
     def __registration(self) -> None:
-        global _current_user
+        #global _current_user
         fields: dict = self.__get_register_form_fields()
         self.__validate_user(fields["email"], fields["password"])
         
@@ -80,17 +108,25 @@ class ServerHandler(SimpleHTTPRequestHandler):
                              self.__hash_password(fields["password"]))
         
         if self._db.try_add(newUser):
-            _current_user = newUser
-            self.__hit_homepage()
+            #_current_user = newUser
+            #self.__hit_homepage()
+            self._sessionsManager.create_session(self.client_address[0], newUser)
+            self.send_response(301)
+            self.send_header('Content-type', 'text/html')
+            self.send_header('Location', '/pages/home.html')
+            self.end_headers()
         else:
             self.send_error(409, "Email already in used")
             
     def __hit_homepage(self) -> None:
+        ...
+        
+        """
         self.send_response(301)
         self.send_header('Content-type', 'text/html')
         self.send_header('Location', '/pages/home.html')
         self.end_headers()
-        
+        """
     def __create_cookie(self) -> SimpleCookie:
         global _current_user
         newCookie: SimpleCookie = cookies.SimpleCookie()
