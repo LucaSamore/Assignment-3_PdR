@@ -1,5 +1,5 @@
+import os.path
 from typing import Optional
-from os import path
 
 class Router:
     _protected_routes: list = ['/pages/home.html', 
@@ -8,12 +8,20 @@ class Router:
                                '/pages/service3.html']
     
     def handle_route(self, route: str) -> Optional[str]:
-        print(route)
         if route == "/":
             return "/pages/index.html"
-        if path.exists(route):
-            return route
+        return self.find_page(route)
+    
+    def find_page(self, pagePath: str) -> Optional[str]:
+        print("Percorso pagina da trovare")
+        print(pagePath)
+        
+        return pagePath
+        """
+        if os.path.isfile(pagePath):
+            return pagePath
         return None
+        """
     
     def is_protected(self, route: str) -> bool:
         return route in self._protected_routes

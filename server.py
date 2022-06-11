@@ -12,24 +12,32 @@ from auth import AuthorizationHandler
 from http import cookies
 from http.cookies import SimpleCookie
 
+
+_current_user: User = None
+
+
 class ServerHandler(SimpleHTTPRequestHandler):
     _router: Router = Router()
     _db: DBHandler = DBHandler()
     _auth: AuthorizationHandler = AuthorizationHandler()
-    _current_user: User = None
+    #_current_user: User = None
     
     def do_GET(self) -> None:
         result: Optional[str] = self._router.handle_route(self.path)
+        
         if result:            
-            self.send_response(302)
+            self.send_response(200)
             print(self.path)
             if self._router.is_protected(self.path):
                 if not self.__verify_token():
                     result = "/pages/index.html"
+            self.send_header('Content-type', 'text/html')
             self.send_header('Location', result)
             self.end_headers()
+            #self.wfile.write(self.__read_page(result).encode())
         else:
             print("HEYOOO")
+            self.send_error(404)
         SimpleHTTPRequestHandler.do_GET(self)
             
     def do_POST(self) -> None:
@@ -40,7 +48,8 @@ class ServerHandler(SimpleHTTPRequestHandler):
             self.__registration()
     
     def end_headers(self):
-        if self._current_user and not self.headers.get('Set-Cookie'):
+        global _current_user
+        if _current_user and not self.headers.get('Set-Cookie'):
             cookie: SimpleCookie = self.__create_cookie()
             for morsel in cookie.values():
                 self.send_header("Set-Cookie", morsel.OutputString())
@@ -49,17 +58,19 @@ class ServerHandler(SimpleHTTPRequestHandler):
     
         
     def __login(self) -> None:
+        global _current_user
         fields: dict = self.__get_login_form_fields()
         self.__validate_user(fields["email"], fields["password"])
         loggedUser: User = self._db.find_user(fields["email"], fields["password"])
         
         if loggedUser:
-            self._current_user = loggedUser
+            _current_user = loggedUser
             self.__hit_homepage()
         else:
             self.send_error(401, "User not found")
         
     def __registration(self) -> None:
+        global _current_user
         fields: dict = self.__get_register_form_fields()
         self.__validate_user(fields["email"], fields["password"])
         
@@ -69,7 +80,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
                              self.__hash_password(fields["password"]))
         
         if self._db.try_add(newUser):
-            self._current_user = newUser
+            _current_user = newUser
             self.__hit_homepage()
         else:
             self.send_error(409, "Email already in used")
@@ -81,14 +92,21 @@ class ServerHandler(SimpleHTTPRequestHandler):
         self.end_headers()
         
     def __create_cookie(self) -> SimpleCookie:
+        global _current_user
         newCookie: SimpleCookie = cookies.SimpleCookie()
-        newCookie['token'] = self._auth.encode_jwt_token(self._current_user)
+        newCookie['token'] = self._auth.encode_jwt_token(_current_user)
         return newCookie
     
     def __verify_token(self) -> bool:
-        token: str = self.headers['Cookie'].split("=")[1]
+        global _current_user
+        
+        if not self.headers['Cookie'] or not _current_user:
+            return False
+        
+        token: str = self.headers['Cookie'].split("=")[1][:-7]
+        print("TOKEN 11111")
         print(token)
-        return self._auth.is_valid(self._current_user, token)
+        return self._auth.is_valid(_current_user, token)
     
     def __create_authorization_header(self, user: User) -> None:
         self.send_header('Authorization', 'Bearer ' + self._auth.encode_jwt_token(user))
@@ -125,3 +143,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
             'email': form.getvalue('email'), 
             'password': form.getvalue('psw')
         }
+    
+    def __read_page(self, pageName: str) -> str:
+        with open(pageName, 'r') as page:
+            return page.read()

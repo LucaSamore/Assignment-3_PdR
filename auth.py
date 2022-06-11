@@ -10,7 +10,13 @@ class AuthorizationHandler:
         return jwt.encode(payload.__dict__, CONFIG['token_secret'], CONFIG['token_algorithm'])
     
     def decode_jwt_token(self, token: str) -> dict:
+        print("TOKEN 33333")
+        print(token)
         return jwt.decode(token, CONFIG['token_secret'], CONFIG['token_algorithm'])
     
     def is_valid(self, toValidate: T, token: str) -> bool:
+        print("toValidate")
+        print(toValidate)
+        print("TOKEN 22222")
+        print(token)
         return toValidate.__dict__ == self.decode_jwt_token(token)
