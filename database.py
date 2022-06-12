@@ -32,7 +32,7 @@ class OperationStrategies:
     def write_sessions(sessions: list[Session], path: str) -> None:
         sessions = map(lambda s: Session(s.ip, s.user.__dict__, s.created_at.isoformat(), s.duration), sessions)
         with open(path, 'w') as file:
-            json.dump([session.__dict__ for session in sessions], file, indent=1, default=str)
+            json.dump([session.__dict__ for session in sessions], file, indent=1)
     
     @staticmethod
     def read_sessions(path: str) -> list[Session]:
@@ -40,7 +40,4 @@ class OperationStrategies:
         with open(path) as file:
             sessions = json.load(file, object_hook=lambda d: Namespace(**d))
         sessions = list(map(lambda s: Session(s.ip, s.user, datetime.strptime(s.created_at, "%Y-%m-%dT%H:%M:%S.%f"), s.duration), sessions))
-        print("Tipo di sessions")
-        print(type(sessions))
-        print(sessions)
         return sessions
