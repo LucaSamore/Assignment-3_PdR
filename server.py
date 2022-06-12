@@ -2,23 +2,21 @@ import re
 import cgi
 import bcrypt
 from http.server import SimpleHTTPRequestHandler
+from model import User, Session
+from managers import UsersManager, SessionsManager
 from router import Router
 from cgi import FieldStorage
 from re import Match, Pattern
 from typing import Optional
-from fakeDBhandler import DBHandler
-from user import User
 from auth import AuthorizationHandler
 from http import cookies
 from http.cookies import SimpleCookie
-from session import Session
-from session import SessionsManager
 
 _current_user: User = None
 
 class ServerHandler(SimpleHTTPRequestHandler):
     _router: Router = Router()
-    _db: DBHandler = DBHandler()
+    _usersManager: UsersManager = UsersManager()
     _sessionsManager = SessionsManager()
     _auth: AuthorizationHandler = AuthorizationHandler()
     #_current_user: User = None
@@ -37,6 +35,10 @@ class ServerHandler(SimpleHTTPRequestHandler):
                     self.path = "/pages/index.html"
                 else:
                     self.path = result
+                # il problema è che se uno che non ha fatto il login accede alla home
+                # e sul db esiste una sessione non scaduta per quell'ip, l'accesso alla home
+                # avviene con successo anche senza login perché esiste una sessione con quell'ip
+                # ma noi ovviamente non vogliamo questa cosa
         else:
             self.send_error(404)
         
@@ -83,7 +85,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
         #global _current_user
         fields: dict = self.__get_login_form_fields()
         self.__validate_user(fields["email"], fields["password"])
-        loggedUser: User = self._db.find_user(fields["email"], fields["password"])
+        loggedUser: User = self._usersManager.find_user(fields["email"], fields["password"])
         
         if loggedUser:
             #_current_user = loggedUser
@@ -107,7 +109,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
                              fields["email"], 
                              self.__hash_password(fields["password"]))
         
-        if self._db.try_add(newUser):
+        if self._usersManager.try_add(newUser):
             #_current_user = newUser
             #self.__hit_homepage()
             self._sessionsManager.create_session(self.client_address[0], newUser)

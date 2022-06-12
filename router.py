@@ -1,4 +1,4 @@
-import os.path
+from os import path
 from typing import Optional
 
 class Router:
@@ -13,12 +13,11 @@ class Router:
         return self.find_page(route)
     
     def find_page(self, pagePath: str) -> Optional[str]:
-        print("Percorso pagina da trovare")
-        print(pagePath)
         
         return pagePath
+        
         """
-        if os.path.isfile(pagePath):
+        if path.exists(pagePath):
             return pagePath
         return None
         """

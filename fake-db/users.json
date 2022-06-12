@@ -16,5 +16,29 @@
   "surname": "BBB",
   "email": "aaa@gmail.com",
   "password": "$2b$12$7bKj99kbHBvdb3e7Zs3K4OXpKag.qwez8P.5WMzIy0my38dke/BJy"
+ },
+ {
+  "name": "AAA",
+  "surname": "BBB",
+  "email": "cccc@gmail.com",
+  "password": "$2b$12$TNtUfakignIWvUL1YWG5xuoIziNfF9i93yI6t2Rd3cx7MXHMhi8QK"
+ },
+ {
+  "name": "qwe",
+  "surname": "qwe",
+  "email": "ssss@gmail.com",
+  "password": "$2b$12$9M/M6gQAMZVw.OGKP76EO.iXrBHXkt2OzenzNVxp8TkYuqAqDDXW."
+ },
+ {
+  "name": "Mario",
+  "surname": "Marione",
+  "email": "marioo@gmail.com",
+  "password": "$2b$12$eQJzXXJS2Fk8tiTf8T9Kd.WrDpfquVfE.7AFYT34MWLGNv6Xnu67u"
+ },
+ {
+  "name": "Booo",
+  "surname": "Nonlosoo",
+  "email": "zzzz@gmail.com",
+  "password": "$2b$12$Hp65Op6t1HqCof3U45kU5.TzqSUTDoQh0L7MU/GecpAUZPv9AR4Pm"
  }
 ]
