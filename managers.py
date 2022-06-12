@@ -40,16 +40,24 @@ class SessionsManager:
         self.__read_sessions()
     
     def create_session(self, ip: str, user: User) -> None:
-        newSession: Session = Session(ip, user)
-        for existing in self.find_sessions_by_user_and_ip(ip, user):
+        newSession: Session = Session(ip, user, datetime.now(), 1)
+        filtered: list[Session] = self.find_sessions_by_user_and_ip(ip, user)
+        for existing in filtered:
+            print("Existing session")
+            print(existing)
+            print("Sessioni in lista")
+            print(self._sessions)
             self.delete_session(existing)
+            print("Sessioni in lista dopo eliminazione")
+            print(self._sessions)
         self._sessions.append(newSession)
+        print("Sessioni in lista dopo nuova aggiunta")
+        print(self._sessions)
         self.__save_sessions()
         
     def delete_session(self, session: Session) -> None:
         if session in self._sessions:
             self._sessions.remove(session)
-            self.__save_sessions()
     
     def has_session(self, ip: str) -> bool:
         return ip in map(lambda s: s.ip, self._sessions)
@@ -60,8 +68,8 @@ class SessionsManager:
     def find_session_by_ip(self, ip: str) -> Optional[Session]:
         return next((s for s in self._sessions if s.ip == ip), None)
     
-    def find_sessions_by_user_and_ip(self, ip: str, user: User) -> list:
-        yield filter(lambda s: s.ip == ip and s.user == user, self._sessions)
+    def find_sessions_by_user_and_ip(self, ip: str, user: User) -> list[Session]:
+        return list(filter(lambda s: s.ip == ip and s.user == user, self._sessions))
     
     def __save_sessions(self) -> None:
         self._db.perform_write_operation(OperationStrategies.write_sessions(self._sessions, CONFIG['session_path']))
