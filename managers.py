@@ -35,17 +35,21 @@ class UsersManager:
 
 class SessionsManager:
     def __init__(self):
-        self._sessions: list = []
+        self._db = DatabaseHandler()
+        self._sessions: list[Session] = []
+        self.__read_sessions()
     
     def create_session(self, ip: str, user: User) -> None:
         newSession: Session = Session(ip, user)
         for existing in self.find_sessions_by_user_and_ip(ip, user):
             self.delete_session(existing)
         self._sessions.append(newSession)
+        self.__save_sessions()
         
     def delete_session(self, session: Session) -> None:
         if session in self._sessions:
             self._sessions.remove(session)
+            self.__save_sessions()
     
     def has_session(self, ip: str) -> bool:
         return ip in map(lambda s: s.ip, self._sessions)
@@ -58,3 +62,9 @@ class SessionsManager:
     
     def find_sessions_by_user_and_ip(self, ip: str, user: User) -> list:
         yield filter(lambda s: s.ip == ip and s.user == user, self._sessions)
+    
+    def __save_sessions(self) -> None:
+        self._db.perform_write_operation(OperationStrategies.write_sessions(self._sessions, CONFIG['session_path']))
+    
+    def __read_sessions(self) -> None:
+        self._sessions = self._db.perform_read_operation(OperationStrategies.read_sessions(CONFIG['session_path']))
