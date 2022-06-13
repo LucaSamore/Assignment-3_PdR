@@ -40,5 +40,11 @@
   "surname": "Nonlosoo",
   "email": "zzzz@gmail.com",
   "password": "$2b$12$Hp65Op6t1HqCof3U45kU5.TzqSUTDoQh0L7MU/GecpAUZPv9AR4Pm"
+ },
+ {
+  "name": "WWW",
+  "surname": "WWW",
+  "email": "www@gmail.com",
+  "password": "$2b$12$11D5vw78CNIjVBpgkVT8a.vbPNM5VXcRAFmcHc1geEzeqYjxHP/Tq"
  }
 ]

@@ -30,7 +30,7 @@ class OperationStrategies:
     
     @staticmethod
     def write_sessions(sessions: list[Session], path: str) -> None:
-        sessions = map(lambda s: Session(s.ip, s.user.__dict__, s.created_at.isoformat(), s.duration), sessions)
+        sessions = map(lambda s: Session(s.uuid, s.ip, s.user.__dict__, s.created_at.isoformat(), s.duration), sessions)
         with open(path, 'w') as file:
             json.dump([session.__dict__ for session in sessions], file, indent=1)
     
@@ -39,5 +39,5 @@ class OperationStrategies:
         sessions: list[Session] = []
         with open(path) as file:
             sessions = json.load(file, object_hook=lambda d: Namespace(**d))
-        sessions = list(map(lambda s: Session(s.ip, s.user, datetime.strptime(s.created_at, "%Y-%m-%dT%H:%M:%S.%f"), s.duration), sessions))
+        sessions = list(map(lambda s: Session(s.uuid, s.ip, s.user, datetime.strptime(s.created_at, "%Y-%m-%dT%H:%M:%S.%f"), s.duration), sessions))
         return sessions

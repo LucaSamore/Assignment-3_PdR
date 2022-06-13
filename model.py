@@ -10,6 +10,7 @@ class User:
 
 @dataclass
 class Session:
+    uuid: str
     ip: str
     user: User
     created_at: datetime = datetime.now()

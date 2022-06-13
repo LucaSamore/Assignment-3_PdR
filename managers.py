@@ -1,3 +1,4 @@
+import uuid
 import bcrypt
 from model import User, Session
 from config import CONFIG
@@ -40,19 +41,11 @@ class SessionsManager:
         self.__read_sessions()
     
     def create_session(self, ip: str, user: User) -> None:
-        newSession: Session = Session(ip, user, datetime.now(), 1)
+        newSession: Session = Session(str(uuid.uuid4()), ip, user, datetime.now(), 1)
         filtered: list[Session] = self.find_sessions_by_user_and_ip(ip, user)
         for existing in filtered:
-            print("Existing session")
-            print(existing)
-            print("Sessioni in lista")
-            print(self._sessions)
             self.delete_session(existing)
-            print("Sessioni in lista dopo eliminazione")
-            print(self._sessions)
         self._sessions.append(newSession)
-        print("Sessioni in lista dopo nuova aggiunta")
-        print(self._sessions)
         self.__save_sessions()
         
     def delete_session(self, session: Session) -> None:
