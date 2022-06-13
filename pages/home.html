@@ -11,26 +11,82 @@
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="">
+
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Quicksand', sans-serif;
+                color: aliceblue;
+            }
+
+            body{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                min-height: 100vh;
+                background: #1e1e1e;
+            }
+
+            .header{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .container{
+                position: relative;
+                width: 50%;
+                min-height: 350px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            a{
+                text-decoration: none;
+                transition: all .2s ease-in-out;
+            }
+
+            a:hover { transform: scale(1.1); }
+
+            #download{
+                padding: 15px 25px 15px 25px;
+                color: white;
+                font-weight: bold;
+                background: linear-gradient(45deg, #f77062, #fe5196);
+                border-radius: 25px;
+                border: none;
+            }
+        </style>
+
     </head>
     <body>
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        <h1>Homepage</h1>
-        <p>Here's the list of services</p>
-        <h2>Services</h2>
-        <ul>
-            <li>
-                <a href="http://localhost:8080/pages/service1.html">Service 1</a>
-            </li>
-            <li>
-                <a href="http://localhost:8080/pages/service2.html">Service 2</a>
-            </li>
-            <li>
-                <a href="http://localhost:8080/pages/service3.html">Service 3</a>
-            </li>
-        </ul>
-        <a href="http://localhost:8080/traccia.pdf" download="pdf">Download PDF</a>
+
+        <div class="header">
+            <h1>Homepage</h1>
+            <p>Here's the list of services</p>
+        </div>
+
+        <div class="container">
+            <h2>Services</h2>
+            <a href="http://localhost:8080/pages/service1.html">Service 1</a>
+            <a href="http://localhost:8080/pages/service2.html">Service 2</a>
+            <a href="http://localhost:8080/pages/service3.html">Service 3</a>
+        </div>
+
+        <a id="download" href="http://localhost:8080/traccia.pdf" download="pdf">Download PDF</a>
         <script src="" async defer></script>
     </body>
 </html>
