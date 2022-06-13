@@ -40,13 +40,14 @@ class SessionsManager:
         self._sessions: list[Session] = []
         self.__read_sessions()
     
-    def create_session(self, ip: str, user: User) -> None:
+    def create_session(self, ip: str, user: User) -> str:
         newSession: Session = Session(str(uuid.uuid4()), ip, user, datetime.now(), 1)
         filtered: list[Session] = self.find_sessions_by_user_and_ip(ip, user)
         for existing in filtered:
             self.delete_session(existing)
         self._sessions.append(newSession)
         self.__save_sessions()
+        return newSession.uuid
         
     def delete_session(self, session: Session) -> None:
         if session in self._sessions:
@@ -63,6 +64,9 @@ class SessionsManager:
     
     def find_sessions_by_user_and_ip(self, ip: str, user: User) -> list[Session]:
         return list(filter(lambda s: s.ip == ip and s.user == user, self._sessions))
+    
+    def find_session_by_uuid(self, givenUUID: str) -> Optional[Session]:
+        return next((s for s in self._sessions if s.uuid == givenUUID), None)
     
     def __save_sessions(self) -> None:
         self._db.perform_write_operation(OperationStrategies.write_sessions(self._sessions, CONFIG['session_path']))
