@@ -43,8 +43,7 @@ class SessionsManager:
     def create_session(self, ip: str, user: User) -> str:
         newSession: Session = Session(str(uuid.uuid4()), ip, user, datetime.now(), 1)
         filtered: list[Session] = self.__find_sessions_by_user_and_ip(ip, user)
-        for existing in filtered:
-            self.delete_session(existing)
+        [self.delete_session(existing) for existing in filtered]
         self._sessions.append(newSession)
         self.__save_sessions()
         return newSession.uuid

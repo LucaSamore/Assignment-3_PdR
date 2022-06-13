@@ -17,24 +17,21 @@ class ServerHandler(SimpleHTTPRequestHandler):
     _sessionsManager = SessionsManager()
     
     def do_GET(self) -> None:
-        result: Optional[str] = self._router.handle_route(self.path)
-        if result:
-            self.send_response(200)
-            if not self._sessionsManager.has_session(self.client_address[0]):
-                self.path = "/pages/index.html"
-            else:
-                uuid_from_cookie: Optional[str] = self.__parse_cookie()
-                if uuid_from_cookie:
-                    current_session: Session = self._sessionsManager.find_session_by_uuid(uuid_from_cookie)
-                    if current_session and self._sessionsManager.is_expired(current_session):
-                        self._sessionsManager.delete_session(current_session)
-                        self.path = "/pages/index.html"
-                    else:
-                        self.path = result
-                else:
-                    self.path = "/pages/index.html"
+        result: str = self._router.handle_route(self.path)
+        self.send_response(200)
+        if not self._sessionsManager.has_session(self.client_address[0]):
+            self.path = "/pages/index.html"
         else:
-            self.send_error(404)
+            uuid_from_cookie: Optional[str] = self.__parse_cookie()
+            if uuid_from_cookie:
+                current_session: Session = self._sessionsManager.find_session_by_uuid(uuid_from_cookie)
+                if current_session and self._sessionsManager.is_expired(current_session):
+                    self._sessionsManager.delete_session(current_session)
+                    self.path = "/pages/index.html"
+                else:
+                    self.path = result
+            else:
+                self.path = "/pages/index.html"
         SimpleHTTPRequestHandler.do_GET(self)
             
     def do_POST(self) -> None:
@@ -55,14 +52,7 @@ class ServerHandler(SimpleHTTPRequestHandler):
         self.__validate_user(fields["email"], fields["password"])
         loggedUser: User = self._usersManager.find_user(fields["email"], fields["password"])
         if loggedUser:
-            session_uuid: str = self._sessionsManager.create_session(self.client_address[0], loggedUser)
-            cookie: SimpleCookie = self.__create_cookie(session_uuid)
-            self.send_response(301)
-            self.send_header('Content-type', 'text/html')
-            self.send_header('Location', '/pages/home.html')
-            for morsel in cookie.values():
-                self.send_header("Set-Cookie", morsel.OutputString())
-            self.end_headers()
+            self.__hit_homepage(loggedUser)
         else:
             self.send_error(401, "User not found")
         
@@ -74,16 +64,18 @@ class ServerHandler(SimpleHTTPRequestHandler):
                              fields["email"], 
                              self.__hash_password(fields["password"]))
         if self._usersManager.try_add(newUser):
-            session_uuid: str = self._sessionsManager.create_session(self.client_address[0], newUser)
-            cookie: SimpleCookie = self.__create_cookie(session_uuid)
-            self.send_response(301)
-            self.send_header('Content-type', 'text/html')
-            self.send_header('Location', '/pages/home.html')
-            for morsel in cookie.values():
-                self.send_header("Set-Cookie", morsel.OutputString())
-            self.end_headers()
+            self.__hit_homepage(newUser)
         else:
             self.send_error(409, "Email already in used")
+
+    def __hit_homepage(self, user: User) -> None:
+        session_uuid: str = self._sessionsManager.create_session(self.client_address[0], user)
+        cookie: SimpleCookie = self.__create_cookie(session_uuid)
+        self.send_response(301)
+        self.send_header('Content-type', 'text/html')
+        self.send_header('Location', '/pages/home.html')
+        [self.send_header("Set-Cookie", morsel.OutputString()) for morsel in cookie.values()]
+        self.end_headers()
 
     def __create_cookie(self, uuid: str) -> SimpleCookie:
         newCookie: SimpleCookie = cookies.SimpleCookie()
