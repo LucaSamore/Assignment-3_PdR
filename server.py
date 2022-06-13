@@ -43,6 +43,12 @@ class ServerHandler(SimpleHTTPRequestHandler):
         
         if self.path.find("register") != -1:
             self.__registration()
+            
+    def end_headers(self) -> None:
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", "0")
+        SimpleHTTPRequestHandler.end_headers(self)
         
     def __login(self) -> None:
         fields: dict = self.__get_login_form_fields()
