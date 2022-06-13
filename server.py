@@ -18,13 +18,11 @@ class ServerHandler(SimpleHTTPRequestHandler):
     
     def do_GET(self) -> None:
         result: Optional[str] = self._router.handle_route(self.path)
-        
         if result:
             self.send_response(200)
             if not self._sessionsManager.has_session(self.client_address[0]):
                 self.path = "/pages/index.html"
             else:
-                #current_session: Session = self._sessionsManager.find_session_by_ip(self.client_address[0])
                 uuid_from_cookie: Optional[str] = self.__parse_cookie()
                 if uuid_from_cookie:
                     current_session: Session = self._sessionsManager.find_session_by_uuid(uuid_from_cookie)
@@ -37,7 +35,6 @@ class ServerHandler(SimpleHTTPRequestHandler):
                     self.path = "/pages/index.html"
         else:
             self.send_error(404)
-        
         SimpleHTTPRequestHandler.do_GET(self)
             
     def do_POST(self) -> None:
@@ -51,41 +48,33 @@ class ServerHandler(SimpleHTTPRequestHandler):
         fields: dict = self.__get_login_form_fields()
         self.__validate_user(fields["email"], fields["password"])
         loggedUser: User = self._usersManager.find_user(fields["email"], fields["password"])
-        
         if loggedUser:
             session_uuid: str = self._sessionsManager.create_session(self.client_address[0], loggedUser)
             cookie: SimpleCookie = self.__create_cookie(session_uuid)
             self.send_response(301)
             self.send_header('Content-type', 'text/html')
             self.send_header('Location', '/pages/home.html')
-            
             for morsel in cookie.values():
                 self.send_header("Set-Cookie", morsel.OutputString())
-            
             self.end_headers()
-            
         else:
             self.send_error(401, "User not found")
         
     def __registration(self) -> None:
         fields: dict = self.__get_register_form_fields()
         self.__validate_user(fields["email"], fields["password"])
-        
         newUser: User = User(fields["name"], 
                              fields["surname"], 
                              fields["email"], 
                              self.__hash_password(fields["password"]))
-        
         if self._usersManager.try_add(newUser):
             session_uuid: str = self._sessionsManager.create_session(self.client_address[0], newUser)
             cookie: SimpleCookie = self.__create_cookie(session_uuid)
             self.send_response(301)
             self.send_header('Content-type', 'text/html')
             self.send_header('Location', '/pages/home.html')
-            
             for morsel in cookie.values():
                 self.send_header("Set-Cookie", morsel.OutputString())
-            
             self.end_headers()
         else:
             self.send_error(409, "Email already in used")
@@ -117,7 +106,6 @@ class ServerHandler(SimpleHTTPRequestHandler):
     
     def __get_login_form_fields(self) -> dict:
         form: FieldStorage = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD':'POST'})
-        
         return {
             'email': form.getvalue('email'),
             'password': form.getvalue('psw')
@@ -125,7 +113,6 @@ class ServerHandler(SimpleHTTPRequestHandler):
     
     def __get_register_form_fields(self) -> dict:
         form: FieldStorage = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD':'POST'})
-        
         return {
             'name': form.getvalue('name'), 
             'surname': form.getvalue('surname'), 

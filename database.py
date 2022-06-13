@@ -7,7 +7,6 @@ from typing import TypeVar, Callable
 T = TypeVar("T")
 
 class DatabaseHandler:
-    
     def perform_write_operation(self, strategy: Callable[[list[T], str], None]) -> None:
         strategy
     
@@ -15,7 +14,6 @@ class DatabaseHandler:
         return strategy
 
 class OperationStrategies:
-    
     @staticmethod
     def write_users(users: list[User], path: str) -> None:
         with open(path, 'w') as file:

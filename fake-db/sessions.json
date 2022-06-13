@@ -1,6 +1,6 @@
 [
  {
-  "uuid": "ff81fec8-ed0d-45a5-9c96-9858353afc1e",
+  "uuid": "c6eb446f-d805-4edd-bec6-311fe25daa7b",
   "ip": "127.0.0.1",
   "user": {
    "name": "Mario",
@@ -8,19 +8,7 @@
    "email": "ciaone@gmail.com",
    "password": "$2b$12$fvqq/yE.U8A4nL6mMYTJt.wIy5YEksY5uhfEGLV7w5uYfFH0TBpSC"
   },
-  "created_at": "2022-06-13T11:08:08.644383",
-  "duration": 1
- },
- {
-  "uuid": "2113841a-8d3f-449d-beee-4b67277948cf",
-  "ip": "127.0.0.1",
-  "user": {
-   "name": "Luigi",
-   "surname": "Verdi",
-   "email": "luigi@gmail.com",
-   "password": "$2b$12$AM5tnkR/KR3L9dUruMVmvuApqoQZyuNOcQwOIXHK5ZPHmSA/9Qw0m"
-  },
-  "created_at": "2022-06-13T11:08:28.228508",
+  "created_at": "2022-06-13T11:20:33.657304",
   "duration": 1
  }
 ]

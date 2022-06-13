@@ -42,7 +42,7 @@ class SessionsManager:
     
     def create_session(self, ip: str, user: User) -> str:
         newSession: Session = Session(str(uuid.uuid4()), ip, user, datetime.now(), 1)
-        filtered: list[Session] = self.find_sessions_by_user_and_ip(ip, user)
+        filtered: list[Session] = self.__find_sessions_by_user_and_ip(ip, user)
         for existing in filtered:
             self.delete_session(existing)
         self._sessions.append(newSession)
@@ -59,14 +59,11 @@ class SessionsManager:
     def is_expired(self, session: Session) -> bool:
         return datetime.now() >= session.created_at + timedelta(hours=session.duration)
     
-    def find_session_by_ip(self, ip: str) -> Optional[Session]:
-        return next((s for s in self._sessions if s.ip == ip), None)
-    
-    def find_sessions_by_user_and_ip(self, ip: str, user: User) -> list[Session]:
-        return list(filter(lambda s: s.ip == ip and s.user == user, self._sessions))
-    
     def find_session_by_uuid(self, givenUUID: str) -> Optional[Session]:
         return next((s for s in self._sessions if s.uuid == givenUUID), None)
+
+    def __find_sessions_by_user_and_ip(self, ip: str, user: User) -> list[Session]:
+        return list(filter(lambda s: s.ip == ip and s.user == user, self._sessions))
     
     def __save_sessions(self) -> None:
         self._db.perform_write_operation(OperationStrategies.write_sessions(self._sessions, CONFIG['session_path']))
