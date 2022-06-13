@@ -10,13 +10,63 @@
         <title></title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Quicksand', sans-serif;
+                color: aliceblue;
+            }
+
+            body{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-direction: column;
+                min-height: 75vh;
+                background: #1e1e1e;
+            }
+
+            .content{
+                position: relative;
+                width: 35%;
+                min-height: 500px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                align-content: flex-start;
+                gap: 2rem;
+            }
+
+            article{
+                text-align: justify;
+            }
+
+            a{
+                text-decoration: none;
+                transition: all .2s ease-in-out;
+            }
+
+            a:hover { transform: scale(1.1); }
+        </style>
     </head>
     <body>
         <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        <h1>Service 3</h1>
+
+        <div class="content">
+            <h1>Service 3</h1>
+            <article>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. 
+                The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</article>
+        </div>
+
+        <a href="http://localhost:8080/pages/home.html">Back Home</a>
+        
         <script src="" async defer></script>
     </body>
 </html>
