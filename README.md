@@ -9,7 +9,7 @@ Since the server uses `bcrypt` for password hashing, please make sure you have t
 By default the server runs on `localhost:8080`, but you can change this configuration by editing `config.py` file.
 
 ### Warning
-If you change the socket configuration, please update all the html pages too!
+If you change the socket configuration, please update all the html pages too!  
 All static html pages are stored inside the `/pages` folder.
 
 ## Run the server
@@ -20,5 +20,5 @@ python main.py
 ```
 Enjoy
 
-# Author
+## Author
 [Luca Samorè](https://github.com/LucaSamore)
