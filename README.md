@@ -2,7 +2,7 @@
 A simple web server with session-based authentication using Python http module.
 
 ## Requirements
-This project requires Python 3.9+
+This project requires Python 3.9+  
 Since the server uses `bcrypt` for password hashing, please make sure you have this module installed as well.
 
 ## Configure
