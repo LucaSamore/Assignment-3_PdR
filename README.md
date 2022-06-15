@@ -28,6 +28,11 @@ Move inside the project folder and run:
 ```
 python main.py
 ```
+You can login using the given test account:
+```
+Email: test@gmail.com
+Password: Tellnobody123
+```
 Enjoy
 
 ## Author
