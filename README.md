@@ -2,8 +2,18 @@
 A simple web server with session-based authentication using Python http module.
 
 ## Requirements
-This project requires Python 3.9+  
+This project requires Python 3.9.7+  
 Since the server uses `bcrypt` for password hashing, please make sure you have this module installed as well.
+
+If you need to install bcrypt you can run:
+
+```
+# with pip
+pip install bcrypt
+
+# with anaconda
+conda install -c anaconda bcrypt
+```
 
 ## Configure
 By default the server runs on `localhost:8080`, but you can change this configuration by editing `config.py` file.
