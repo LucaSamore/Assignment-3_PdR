@@ -102,14 +102,14 @@ class ServerHandler(SimpleHTTPRequestHandler):
     def __hash_password(self, toBeHashed: str) -> str:
         return str(bcrypt.hashpw(toBeHashed.encode('utf-8'), bcrypt.gensalt()), 'UTF-8')
     
-    def __get_login_form_fields(self) -> dict:
+    def __get_login_form_fields(self) -> dict[str,str]:
         form: FieldStorage = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD':'POST'})
         return {
             'email': form.getvalue('email'),
             'password': form.getvalue('psw')
         }
     
-    def __get_register_form_fields(self) -> dict:
+    def __get_register_form_fields(self) -> dict[str,str]:
         form: FieldStorage = cgi.FieldStorage(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD':'POST'})
         return {
             'name': form.getvalue('name'), 
